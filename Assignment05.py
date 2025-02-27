@@ -2,14 +2,14 @@
 # Title: Assignment05
 # Desc: This lab demonstrates using input and output to a file
 # Change Log: (Who, When, When)
-#   Alberto Arriola, 2/12/2025, Created script
+#   Alberto Arriola, 2/19/2025, Created script
 # ------------------------------------------------------------------------------------------ #
 
 
 # Constants
 MENU: str = """---- Course Registration Program ----
   Select from the following menu:
-   1. Register a student for a courses
+   1. Register a student for a course
    2. Show current data
    3. Save data to a file
    4. Exit the program
@@ -20,12 +20,10 @@ FILE_NAME: str = "Enrollments.json"                         # String constant co
 student_first_name: str = " "                               # String variable containing the student's first name
 student_last_name: str = " "                                # String variable containing the student's last name
 course_name: str = " "                                      # String variable containing the course name
-json_data: str = " "                                        # String variable containing data to be uploaded to the external json file
 file: object = None                                         # Object variable for external file
 menu_choice: str = " "                                      # String variable containing the user's menu selection
 student_data: dict[str, str] = {}                           # Dictionary variable for collecting entered student information
 students: list = []                                         # List variable for collecting all the entered student information
-student_data_exists: bool = False                           # Boolean variable to track whether student data has been uploaded or recorded
 
 import json                                                                                     # import json module
 
@@ -33,13 +31,13 @@ import json                                                                     
 try:                                                                                            # try statement for exception handling
     file = open(FILE_NAME, "r")                                                                 # External json file is opened with 'r' read argument, named 'Enrollments.csv' and assigned to the file Object variable
 except FileNotFoundError as e:                                                                  # except statement catches FileNotFoundError
-    print(f"File \"{FILE_NAME}\" does not exist.\n")                                            # Print out custom statement stating that the external file does not exist
+    print()                                                                                     # Extra print() line for formatting
+    print(f"File \"{FILE_NAME}\" does not exist.")                                              # Print out custom statement stating that the external file does not exist
     print("Built-In Python error info: ")                                                       # Print out a header for the built-in Python error messages
     print(e, e.__doc__, type(e), sep='\n')                                                      # Print out value for 'e', documentation for File Not Found error, and error class
 else:                                                                                           # else statement executed if except statement is not triggered
     students = json.load(file)                                                                  # Contents of file is loaded into the students List variable using the json.load() function
     file.close()                                                                                # External json file is closed
-    student_data_exists = True                                                                  # student_data_exists Boolean variable is set to True if external file with student data exists
 
 while (True):                                                                                   # while loop starts so that the program runs until the user chooses to exit
 
@@ -53,9 +51,9 @@ while (True):                                                                   
         while True:                                                                             # while Loop continues to execute if the user enters a first name with a number
             try:                                                                                # try statement for exception handling
                 student_first_name = input("Enter the student's first name: ")                  # input() asks user to enter student's first name and assigns answer to student_first_name string variable
-                if not student_first_name.isalpha():                                            # if statement checking if student's first name contains numbers
-                    raise Exception("The student's first name should only contain letters.")    # Exception message for when student's first name contains numbers
-            except Exception as e:                                                              # Exception is thrown if student's first name contains numbers
+                if not student_first_name.isalpha():                                            # if statement checking if student's first name contains non-alpha characters
+                    raise Exception("The student's first name should only contain letters.")    # Exception message for when student's first name contains non-alpha characters
+            except Exception as e:                                                              # Exception is thrown if student's first name contains non-alpha characters
                 print(e)                                                                        # Print e; Exception message
                 print()                                                                         # Extra print() line for formatting
                 continue                                                                        # continue statement returns user to start of while Loop to enter student's first name again
@@ -65,9 +63,9 @@ while (True):                                                                   
         while True:                                                                             # while Loop continues to execute if the user enters a last name with a number
             try:                                                                                # try statement for exception handling
                 student_last_name = input("Enter the student's last name: ")                    # input() asks user to enter student's last name and assigns answer to student_last_name string variable
-                if not student_last_name.isalpha():                                             # if statement checking if student's last name contains numbers
-                    raise Exception("The student's last name should only contain letters.")     # Exception message for when student's first name contains numbers
-            except Exception as e:                                                              # Exception is thrown if student's first name contains numbers
+                if not student_last_name.isalpha():                                             # if statement checking if student's last name contains non-alpha characters
+                    raise Exception("The student's last name should only contain letters.")     # Exception message for when student's first name contains non-alpha characters
+            except Exception as e:                                                              # Exception is thrown if student's first name contains non-alpha characters
                 print(e)                                                                        # Print e; Exception message
                 print()                                                                         # Extra print() line for formatting
                 continue                                                                        # continue statement returns user to start of while Loop to enter student's last name again
@@ -79,15 +77,14 @@ while (True):                                                                   
                         "LastName":student_last_name,
                         "CourseName":course_name}                                               # student_first_name, student_last_name, course_name KeyName Value pairs added to the student_data dictionary
         students.append(student_data)                                                           # contents of student_data Dictionary variable is appended to students List variable
-        student_data_exists = True                                                              # student_data_exists boolean variable is set to 'True' because student data has been recorded
         print()                                                                                 # Extra print() line for formatting
         continue                                                                                # continue statement returns the user to the start of the while loop
 
 # Selection 2. Show current data
     elif (menu_choice == "2"):                                                                  # elif statement triggered when user enters "2" from the menu                                                                                          # else statement for nested if statement triggered if student_data boolean variable is 'True' meaning student data has been recorded
-        if student_data_exists == False:                                                        # Nested if statement triggered if student_data_exists boolean variable is 'False' meaning no student data has been recorded
+        if not students:                                                                        # Nested if statement triggered if the students List variable contains no data
             print("There is no student data to display.")                                       # User is notified that no student data exists to be displayed
-        else:                                                                                   # else statement for nested if statement triggered if student_data_exists boolean variable is 'True' meaning student data has been recorded
+        else:                                                                                   # else statement for nested if statement triggered if students List variable contains data
             print()                                                                             # Extra print() line for formatting
             print("The current data is: ")                                                      # Header is printed to notify user of the current student registration data
             for student in students:                                                            # Nested for loop iterates for each student item in the students List variable
@@ -98,17 +95,23 @@ while (True):                                                                   
 
 # Selection 3. Save data to a file
     elif (menu_choice == "3"):                                                                  # elif statement triggered when user enters "3" from the menu                                                                                          # else statement for nested if statement triggered if student_data boolean variable is 'True' meaning student data has been recorded
-        if student_data_exists == False:                                                        # Nested if statement triggered if student_data_exists boolean variable is 'False' meaning no student data has been recorded
+        if not students:                                                                        # Nested if statement triggered if the students List variable contains no data
             print("There is no student data to upload.")                                        # User is notified that no student data exists to be uploaded
-        else:                                                                                   # else statement for nested if statement triggered if student_data_exists boolean variable is 'True' meaning student data has been recorded
+        else:                                                                                   # else statement for nested if statement triggered if students List variable contains data
             file = open(FILE_NAME, "w")                                                         # External json file is opened with 'w' write argument, named 'Enrollments.csv' and assigned to the file Object variable
-            try:
+            try:                                                                                # try statement for exception handling
                 json.dump(studen1, file)                                                        # json.dump function is used to upload contents of students List file to external json file
-            except NameError as e:
-                print("Built-In Python error info: ")
-                print(e, e.__doc__, type(e), sep='\n')
-                print()
-            json.dump(students, file)
+            except NameError as e:                                                              # except statement catches NameError
+                print("An error occurred because the file name for the write function is incorrect.")  # Print out custom statement stating that the file name is incorrect
+                print("Built-In Python error info: ")                                           # Print out a header for the built-in Python error messages
+                print(e, e.__doc__, type(e), sep='\n')                                          # Print out value for 'e', documentation for File Not Found error, and error class
+                print()                                                                         # Extra print() line for formatting
+            except Exception as e:                                                              # except statement catches any unexpected error
+                print("An unexpected error occurred.")                                          # Print out custom statement stating that an unexpected error occurred
+                print("Built-In Python error info: ")                                           # Print out a header for the built-in Python error messages
+                print(e, e.__doc__, type(e), sep='\n')                                          # Print out value for 'e', documentation for File Not Found error, and error class
+                print()                                                                         # Extra print() line for formatting
+            json.dump(students, file)                                                           # Contents of students List variable is read to the external Enrollments.json file using the json.dump() function
             file.close()                                                                        # External json file is closed
             for student in students:                                                            # Nested for loop iterates for each student item in the students List variable
                 print(f"{student["FirstName"]} {student["LastName"]} has "
@@ -123,6 +126,6 @@ while (True):                                                                   
 
 # Invalid selection
     else:                                                                                       # final else statement triggered if user enters anything other than "1", "2", "3", or "4" from the menu
-        print(menu_choice + " is not a valid selection.")                                       # print() tells user that their selection is invalid
+        print("\"" + menu_choice + "\"" + " is not a valid selection.")                         # print() tells user that their selection is invalid
         print()                                                                                 # Extra print() line for formatting
         continue                                                                                # continue statement returns the user to the start of the while loop
